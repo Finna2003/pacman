@@ -108,43 +108,42 @@ void moveGhost(int pacmanX, int pacmanY, int& ghostX, int& ghostY) {
 
 }
 struct Node {
-    int x, y;  // Координати точки
-    int g;     // Вартість шляху від початку до поточної точки
-    int h;     // Оцінка відстані від поточної точки до цільової точки
-    int f;     // Сума g та h
+    int x, y;  
+    int g;    
+    int h;     
+    int f;     
 
-    Node* parent;  // Попередній вузол, через який досягається ця точка
+    Node* parent;  
 
     Node(int x, int y) : x(x), y(y), g(0), h(0), f(0), parent (nullptr) {}
 };
 int calculateG(const Node& current, const Node& successor, const std::vector<std::vector<int>>& labyrinth) {
-    // Отримати різницю координат між поточним та сусіднім вузлом
+    
     int dx = std::abs(current.x - successor.x);
     int dy = std::abs(current.y - successor.y);
 
-    // Вартість переміщення в горизонтальному або вертикальному напрямку
+   
     int straightCost = 1;
 
-    // Вартість переміщення по діагоналі (якщо дозволено)
-    int diagonalCost = 1;
 
-    // Перевірка наявності стіни між поточним та сусіднім вузлом
+
+  
     if (labyrinth[successor.x][successor.y] == 1) {
-        return std::numeric_limits<int>::max();  // Надати високу вартість для недоступних сусідів
+        return std::numeric_limits<int>::max();  
     }
 
-    // Обчислити вартість шляху від початку до сусіда з урахуванням напрямку руху
+    
     if (dx == 1 || dy == 1) {
         return current.g + straightCost;
     }
     else {
-        return current.g + diagonalCost;
+        return current.g;
     }
 }
 
 
 int calculateH(const Node& successor, const Node& target) {
-    // Оцінка відстані від поточної точки до цільової точки (наприклад, відстань Манхеттен)
+   
     return std::abs(successor.x - target.x) + std::abs(successor.y - target.y);
 }
 std::vector<Node> findPath(const Node& start, const Node& target, const std::vector<std::vector<int>>& labyrinth) {
@@ -154,7 +153,7 @@ std::vector<Node> findPath(const Node& start, const Node& target, const std::vec
     openList.push_back(start);
 
     while (!openList.empty()) {
-        // Знайти точку з найменшим значенням "f" серед точок відкритого списку
+        
         Node current = openList[0];
         int currentIndex = 0;
         for (int i = 1; i < openList.size(); i++) {
@@ -164,11 +163,11 @@ std::vector<Node> findPath(const Node& start, const Node& target, const std::vec
             }
         }
 
-        // Видалити поточну точку зі списку відкритих точок та додати її до списку закритих точок
+        
         openList.erase(openList.begin() + currentIndex);
         closedList.push_back(current);
 
-        // Якщо поточна точка - цільова точка, відновити шлях і повернути його
+       
         if (current.x == target.x && current.y == target.y) {
             std::vector<Node> path;
             Node currentPathNode = current;
@@ -178,7 +177,7 @@ std::vector<Node> findPath(const Node& start, const Node& target, const std::vec
                     currentPathNode = *currentPathNode.parent;
                 }
                 else {
-                    break;  // Перервати цикл, оскільки parent == nullptr
+                    break;  
                 }
             }
             std::reverse(path.begin(), path.end());
@@ -188,27 +187,27 @@ std::vector<Node> findPath(const Node& start, const Node& target, const std::vec
 
 
 
-        // Для кожної сусідньої точки:
+        
         for (int i = -1; i <= 1; i++) {
             for (int j = -1; j <= 1; j++) {
                 if (i == 0 && j == 0) {
-                    continue;  // Пропустити поточну точку
+                    continue;  
                 }
                 int neighborX = current.x + i;
                 int neighborY = current.y + j;
 
-                // Перевірити, чи сусідній вузол в межах лабіринту
+                
                 if (neighborX >= 0 && neighborX < labyrinth.size() &&
                     neighborY >= 0 && neighborY < labyrinth[0].size() &&
                     labyrinth[neighborX][neighborY] == 0) {
-                    // Створити сусідню точку
+                    
                     Node neighbor(neighborX, neighborY);
                     neighbor.g = calculateG(current, neighbor, labyrinth);
                     neighbor.h = calculateH(neighbor, target);
                     neighbor.f = neighbor.g + neighbor.h;
-                    neighbor.parent = &closedList.back();  // Вказати на попередню точку
+                    neighbor.parent = &closedList.back();  
 
-                    // Перевірити, чи сусід вже в списку закритих точок
+                    
                     bool inClosedList = false;
                     for (const Node& closedNode : closedList) {
                         if (neighbor.x == closedNode.x && neighbor.y == closedNode.y) {
@@ -217,14 +216,14 @@ std::vector<Node> findPath(const Node& start, const Node& target, const std::vec
                         }
                     }
 
-                    // Якщо сусід не в списку закритих точок:
+                    
                     if (!inClosedList) {
-                        // Знайти сусідню точку в списку відкритих точок
+                        
                         bool inOpenList = false;
                         for (Node& openNode : openList) {
                             if (neighbor.x == openNode.x && neighbor.y == openNode.y) {
                                 inOpenList = true;
-                                // Якщо знайдено коротший шлях до цього сусіда, оновити його значення "g" та "f"
+                               
                                 if (neighbor.g < openNode.g) {
                                     openNode.g = neighbor.g;
                                     openNode.f = neighbor.f;
@@ -233,7 +232,7 @@ std::vector<Node> findPath(const Node& start, const Node& target, const std::vec
                                 break;
                             }
                         }
-                        // Якщо сусід не в списку відкритих точок, додати його туди
+                        
                         if (!inOpenList) {
                             openList.push_back(neighbor);
                         }
@@ -257,7 +256,7 @@ void moveGhost3(int pacmanX, int pacmanY, int& ghostX, int& ghostY, const std::v
     std::vector<Node> path = findPath(start, target, labyrinth);
 
     if (!path.empty()) {
-        // Якщо знайдено шлях, рухати привидом в напрямку першого вузла шляху
+
         Node nextNode = path[0];
         ghostX = nextNode.x;
         ghostY = nextNode.y;
