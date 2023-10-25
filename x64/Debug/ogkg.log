@@ -1,0 +1,12 @@
+﻿  ogkg.cpp
+C:\Users\Инна\program\ogkg\ogkg.cpp(309,51): warning C4244: аргумент: преобразование "int" в "float", возможна потеря данных
+C:\Users\Инна\program\ogkg\ogkg.cpp(309,36): warning C4244: аргумент: преобразование "int" в "float", возможна потеря данных
+C:\Users\Инна\program\ogkg\ogkg.cpp(318,53): warning C4244: аргумент: преобразование "int" в "float", возможна потеря данных
+C:\Users\Инна\program\ogkg\ogkg.cpp(318,32): warning C4244: аргумент: преобразование "int" в "float", возможна потеря данных
+C:\Users\Инна\program\ogkg\ogkg.cpp(323,53): warning C4244: аргумент: преобразование "int" в "float", возможна потеря данных
+C:\Users\Инна\program\ogkg\ogkg.cpp(323,32): warning C4244: аргумент: преобразование "int" в "float", возможна потеря данных
+C:\Users\Инна\program\ogkg\ogkg.cpp(328,53): warning C4244: аргумент: преобразование "int" в "float", возможна потеря данных
+C:\Users\Инна\program\ogkg\ogkg.cpp(328,32): warning C4244: аргумент: преобразование "int" в "float", возможна потеря данных
+C:\Users\Инна\program\ogkg\ogkg.cpp(333,53): warning C4244: аргумент: преобразование "int" в "float", возможна потеря данных
+C:\Users\Инна\program\ogkg\ogkg.cpp(333,32): warning C4244: аргумент: преобразование "int" в "float", возможна потеря данных
+  ogkg.vcxproj -> C:\Users\Инна\program\ogkg\x64\Debug\ogkg.exe
