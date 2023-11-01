@@ -4,6 +4,11 @@
 #include <iostream>
 #include <cmath>
 #include <algorithm>
+#include <queue>
+#include <functional> 
+#include <utility>
+
+using namespace std;
 
 const int GRID_SIZE = 30;
 const int GRID_WIDTH = 20;
@@ -23,6 +28,12 @@ int ghost2Y = 8;
 
 int ghost3X = 5;
 int ghost3Y = 14;
+
+int newX;
+int newY;
+
+int counter = 0;
+
 std::vector<std::vector<int>> labyrinth = {
     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,1},
     {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,1},
@@ -46,59 +57,115 @@ std::vector<std::vector<int>> labyrinth = {
     {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,1}
 };
 
-//int labyrinth[GRID_WIDTH][GRID_HEIGHT] = {
-//    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,1},
-//    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,1},
-//    {1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0,1},
-//    {1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0,1},
-//    {1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,1},
-//    {1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,1},
-//    {1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0,1},
-//    {1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0,1},
-//    {1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0,1},
-//    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,1},
-//    {1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,1},
-//    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,1},
-//    {1, 0, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0,1},
-//    {1, 0, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0,1},
-//    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,1},
-//    {1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0,1},
-//    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,1},
-//    {1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0,1},
-//    {1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0,0},
-//    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,1}
-//};
 
 bool isGameOver = false;
 void moveGhost(int pacmanX, int pacmanY, int& ghostX, int& ghostY) {
     if (pacmanX == ghostX && pacmanY == ghostY) {
         isGameOver = true;
- 
     }
 
     int dx = pacmanX - ghostX;
     int dy = pacmanY - ghostY;
 
+    int firstX = ghostX;
+    int firstY = ghostY;
+
     int newX = ghostX;
     int newY = ghostY;
 
-    if (std::abs(dx) > std::abs(dy)) {
+    if (std::abs(dx) >=std::abs(dy)) {
         if (dx > 0) {
             newX += 1;
+
+            if (newX <= 0 || newX > GRID_WIDTH || newY <= 0 || newY > GRID_HEIGHT || labyrinth[newX][newY] != 0 || (newX==ghostX && newY==ghostY) ){
+                if (dy > 0) {
+                    newY += 1;
+                    newX -= 1;
+                    if (newX <= 0 || newX > GRID_WIDTH || newY <= 0 || newY > GRID_HEIGHT || labyrinth[newX][newY] != 0 || (newX == ghostX && newY == ghostY)) {
+                        newY -= 2;
+
+                    }
+                }
+                if (dy < 0) {
+                    newY -= 1;
+
+                    if (newX <= 0 || newX > GRID_WIDTH || newY <= 0 || newY > GRID_HEIGHT || labyrinth[newX][newY] != 0 || (newX == ghostX && newY == ghostY)) {
+                        newY += 2;
+                        newX -= 1;
+                    }
+                }
+                else { newX -= 2;            
+                }
+            }
         }
         else if (dx < 0) {
             newX -= 1;
+            if (newX <= 0 || newX > GRID_WIDTH || newY <= 0 || newY > GRID_HEIGHT || labyrinth[newX][newY] != 0 || (newX == ghostX && newY == ghostY)) {
+                if (dy > 0) {
+                    newY += 1;
+                    newX += 1;
+                }
+                if (dy < 0) {
+                    newY -= 1;
+                    newX += 1;
+                }
+                else { newX += 2;             
+                }
+            }
         }
     }
-    else {
+    else if (std::abs(dx) < std::abs(dy)) {
         if (dy > 0) {
             newY += 1;
+
+            if (newX <= 0 || newX > GRID_WIDTH || newY <= 0 || newY > GRID_HEIGHT || labyrinth[newX][newY] != 0 || (newX == ghostX && newY == ghostY)) {
+                if (dx > 0) {
+                    newX += 1;
+                    newY -= 1;
+
+                    if (newX <= 0 || newX > GRID_WIDTH || newY <= 0 || newY > GRID_HEIGHT || labyrinth[newX][newY] != 0 || (newX == ghostX && newY == ghostY)) {
+                        newX -= 2;
+
+                    }
+
+                }
+                if (dx < 0) {
+                    newX -= 1;
+                    newY -= 1;
+                    if (newX <= 0 || newX > GRID_WIDTH || newY <= 0 || newY > GRID_HEIGHT || labyrinth[newX][newY] != 0 || (newX == ghostX && newY == ghostY)) {
+                        newX += 2;
+
+                    }
+                }
+                else { newY -= 2;             
+                }
+            }
         }
         else if (dy < 0) {
             newY -= 1;
+
+            if (newX <= 0 || newX > GRID_WIDTH || newY <= 0 || newY > GRID_HEIGHT || labyrinth[newX][newY] != 0 || (newX == ghostX && newY == ghostY)) {
+                if (dx > 0) {
+                    newY += 1;
+                    newX += 1;
+                    if (newX <= 0 || newX > GRID_WIDTH || newY <= 0 || newY > GRID_HEIGHT || labyrinth[newX][newY] != 0 || (newX == ghostX && newY == ghostY)) {
+                        newX -= 2;
+                    }
+                }
+                if (dx < 0) {
+                    newY += 1;
+                    newX -= 1;
+
+                    if (newX <= 0 || newX > GRID_WIDTH || newY <= 0 || newY > GRID_HEIGHT || labyrinth[newX][newY] != 0 || (newX == ghostX && newY == ghostY)) {
+                        newX += 2;
+
+                    }
+                }
+                else { newY += 2;            
+                }
+            }
         }
     }
-
     if (newX >= 0 && newX < GRID_WIDTH && newY >= 0 && newY < GRID_HEIGHT &&
         labyrinth[newX][newY] == 0) {
         ghostX = newX;
@@ -107,166 +174,104 @@ void moveGhost(int pacmanX, int pacmanY, int& ghostX, int& ghostY) {
     }
 
 }
-struct Node {
-    int x, y;  
-    int g;    
-    int h;     
-    int f;     
+pair<int, int> start = make_pair(ghost3X, ghost3Y);
 
-    Node* parent;  
+class Node {
+public:
+    pair<int, int> coordinates;
+    Node* parent;
+    double g, h;
 
-    Node(int x, int y) : x(x), y(y), g(0), h(0), f(0), parent (nullptr) {}
+    Node(pair<int, int> coord, Node* p, double gVal, double hVal)
+        : coordinates(coord), parent(p), g(gVal), h(hVal) {}
+
+    double getF() const { return g + h; }
 };
-int calculateG(const Node& current, const Node& successor, const std::vector<std::vector<int>>& labyrinth) {
-    
-    int dx = std::abs(current.x - successor.x);
-    int dy = std::abs(current.y - successor.y);
 
-   
-    int straightCost = 1;
-
-
-
-  
-    if (labyrinth[successor.x][successor.y] == 1) {
-        return std::numeric_limits<int>::max();  
-    }
-
-    
-    if (dx == 1 || dy == 1) {
-        return current.g + straightCost;
-    }
-    else {
-        return current.g;
-    }
+bool isValid(int row, int col) {
+    return (row >= 0) && (row < GRID_WIDTH) &&
+        (col >= 0) && (col < GRID_HEIGHT);
 }
 
-
-int calculateH(const Node& successor, const Node& target) {
-   
-    return std::abs(successor.x - target.x) + std::abs(successor.y - target.y);
-}
-std::vector<Node> findPath(const Node& start, const Node& target, const std::vector<std::vector<int>>& labyrinth) {
-    std::vector<Node> openList;
-    std::vector<Node> closedList;
-
-    openList.push_back(start);
-
-    while (!openList.empty()) {
-        
-        Node current = openList[0];
-        int currentIndex = 0;
-        for (int i = 1; i < openList.size(); i++) {
-            if (openList[i].f < current.f) {
-                current = openList[i];
-                currentIndex = i;
-            }
-        }
-
-        
-        openList.erase(openList.begin() + currentIndex);
-        closedList.push_back(current);
-
-       
-        if (current.x == target.x && current.y == target.y) {
-            std::vector<Node> path;
-            Node currentPathNode = current;
-            while (currentPathNode.parent != nullptr) {
-                path.push_back(currentPathNode);
-                if (currentPathNode.parent != nullptr) {
-                    currentPathNode = *currentPathNode.parent;
-                }
-                else {
-                    break;  
-                }
-            }
-            std::reverse(path.begin(), path.end());
-            return path;
-        }
-
-
-
-
-        
-        for (int i = -1; i <= 1; i++) {
-            for (int j = -1; j <= 1; j++) {
-                if (i == 0 && j == 0) {
-                    continue;  
-                }
-                int neighborX = current.x + i;
-                int neighborY = current.y + j;
-
-                
-                if (neighborX >= 0 && neighborX < labyrinth.size() &&
-                    neighborY >= 0 && neighborY < labyrinth[0].size() &&
-                    labyrinth[neighborX][neighborY] == 0) {
-                    
-                    Node neighbor(neighborX, neighborY);
-                    neighbor.g = calculateG(current, neighbor, labyrinth);
-                    neighbor.h = calculateH(neighbor, target);
-                    neighbor.f = neighbor.g + neighbor.h;
-                    neighbor.parent = &closedList.back();  
-
-                    
-                    bool inClosedList = false;
-                    for (const Node& closedNode : closedList) {
-                        if (neighbor.x == closedNode.x && neighbor.y == closedNode.y) {
-                            inClosedList = true;
-                            break;
-                        }
-                    }
-
-                    
-                    if (!inClosedList) {
-                        
-                        bool inOpenList = false;
-                        for (Node& openNode : openList) {
-                            if (neighbor.x == openNode.x && neighbor.y == openNode.y) {
-                                inOpenList = true;
-                               
-                                if (neighbor.g < openNode.g) {
-                                    openNode.g = neighbor.g;
-                                    openNode.f = neighbor.f;
-                                    openNode.parent = neighbor.parent;
-                                }
-                                break;
-                            }
-                        }
-                        
-                        if (!inOpenList) {
-                            openList.push_back(neighbor);
-                        }
-                    }
-                }
-            }
-        }
-    }
-    return std::vector<Node>();
+bool isUnblocked(const vector<vector<int>>& maze, int row, int col) {
+    return maze[row][col] == 0;
 }
 
+bool isDestination(int row, int col, pair<int, int> dest) {
+    return (row == dest.first && col == dest.second);
+}
 
-void moveGhost3(int pacmanX, int pacmanY, int& ghostX, int& ghostY, const std::vector<std::vector<int>>& labyrinth) {
-    if (pacmanX == ghostX && pacmanY == ghostY) {
-        isGameOver = true;
+double calculateHValue(int row, int col, pair<int, int> dest) {
+    return sqrt((row - dest.first) * (row - dest.first) + (col - dest.second) * (col - dest.second));
+}
+
+void tracePath(Node* end) {
+    if (end == nullptr)
+        return;
+    tracePath(end->parent);
+    cout << "(" << end->coordinates.first << ", " << end->coordinates.second << ") " << endl;
+}
+
+void aStarSearch(const vector<vector<int>>& maze, pair<int, int> start, pair<int, int> dest) {
+    if (!isValid(start.first, start.second) || !isValid(dest.first, dest.second)) {
+        cout << "Invalid start or end\n";
         return;
     }
 
-    Node start(ghostX, ghostY);
-    Node target(pacmanX, pacmanY);
-    std::vector<Node> path = findPath(start, target, labyrinth);
-
-    if (!path.empty()) {
-
-        Node nextNode = path[0];
-        ghostX = nextNode.x;
-        ghostY = nextNode.y;
-        std::cout << "Ghost3 moved to X: " << ghostX << ", Y: " << ghostY << std::endl;
+    if (!isUnblocked(maze, start.first, start.second) || !isUnblocked(maze, dest.first, dest.second)) {
+        cout << "Start or end blocked\n";
+        return;
     }
-    else {
-        std::cout << "Ghost3 couldn't find a path to Pacman." << std::endl;
+
+    if (isDestination(start.first, start.second, dest)) {
+        cout << "We are already at our destination\n";
+        return;
     }
+
+    bool closedList[GRID_WIDTH][GRID_HEIGHT];
+    memset(closedList, false, sizeof(closedList));
+
+    priority_queue<Node*, vector<Node*>, function<bool(Node*, Node*)>> openList([](Node* a, Node* b) { return a->getF() > b->getF(); });
+
+    openList.push(new Node(start, nullptr, 0.0, 0.0));
+
+    vector<pair<int, int>> path;
+    while (!openList.empty()) {
+        Node* current = openList.top();
+        openList.pop();
+
+
+        int row = current->coordinates.first;
+        int col = current->coordinates.second;
+        closedList[row][col] = true;
+
+        path.push_back(make_pair(row, col));
+        counter += 1;
+
+        if (isDestination(row, col, dest)) {
+            cout << "Found a way: ";
+            tracePath(current);
+            return;
+        }
+        if (!path.empty()) {
+            ghost3X = path[0].first;
+            ghost3Y = path[0].second;
+        }
+        for (int i = -1; i <= 1; ++i) {
+            for (int j = -1; j <= 1; ++j) {
+                double gNew = current->g + 1.0;
+                double hNew = calculateHValue(row + i, col + j, dest);
+                double fNew = gNew + hNew;
+
+                if (isValid(row + i, col + j) && isUnblocked(maze, row + i, col + j) && !closedList[row + i][col + j]) {
+                    openList.push(new Node(make_pair(row + i, col + j), current, gNew, hNew));
+                }
+            }
+        }
+    }
+
+    cout << "Path not found\n";
 }
-
 
 
 void movePacman(int dx, int dy) {
@@ -296,6 +301,7 @@ void movePacman(int dx, int dy) {
     }
 
 }
+
 
 void drawGame(sf::RenderWindow& window) {
     window.clear();
@@ -351,29 +357,29 @@ int main() {
             if (event.type == sf::Event::Closed) {
                 window.close();
             }
-                if (event.type == sf::Event::KeyPressed) {
-                    int first_x = pacmanX;
-                    int  first_y = pacmanY;
-                    if (event.key.code == sf::Keyboard::Up) {
-                        movePacman(0, -1);
-                    }
-                    if (event.key.code == sf::Keyboard::Down) {
-                        movePacman(0, 1);
-                    }
-                    if (event.key.code == sf::Keyboard::Left) {
-                        movePacman(-1, 0);
-                    }
-                    if (event.key.code == sf::Keyboard::Right) {
-                        movePacman(1, 0);
-                    }
-                    if (first_x != pacmanX || first_y != pacmanY) {
-                        moveGhost(pacmanX, pacmanY, ghost1X, ghost1Y);
-                        moveGhost(pacmanX, pacmanY, ghost2X, ghost2Y);
-                        moveGhost3( ghost3X, ghost3Y, pacmanX, pacmanY, labyrinth);
-                    }
-                    if (pacmanX == ghost1X && pacmanY == ghost1Y) {
-                        isGameOver = true;
+            if (event.type == sf::Event::KeyPressed) {
+                int first_x = pacmanX;
+                int  first_y = pacmanY;
+                if (event.key.code == sf::Keyboard::Up) {
+                    movePacman(0, -1);
+                }
+                if (event.key.code == sf::Keyboard::Down) {
+                    movePacman(0, 1);
+                }
+                if (event.key.code == sf::Keyboard::Left) {
+                    movePacman(-1, 0);
+                }
+                if (event.key.code == sf::Keyboard::Right) {
+                    movePacman(1, 0);
+                }
+                if (first_x != pacmanX || first_y != pacmanY) {
+                    moveGhost(pacmanX, pacmanY, ghost1X, ghost1Y);
+                    moveGhost(pacmanX, pacmanY, ghost2X, ghost2Y);
+                    aStarSearch(labyrinth, start, make_pair(pacmanX, pacmanY));
+                }
+                if ((pacmanX == ghost1X && pacmanY == ghost1Y) ||(pacmanX == ghost3X && pacmanY == ghost3Y) ||(pacmanX == ghost2X && pacmanY == ghost2Y)){
                         std::cout << "Game over!" << std::endl;
+                        return 0;
                     }
 
                 
